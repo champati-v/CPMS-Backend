@@ -10,7 +10,7 @@ const doctorSchema = new Schema({
     email: { type: String, required: true, unique: true },
     speciality: { type: String, required: true },
     hospital: { type: String, required: true },
-    experience: { type: Number, required: true },
+    experience: { type: String, required: true },
     password: { type: String, required: true },
     imageUrl: { type: String },
     createdOn : { type: Date, default: new Date().getTime() },
