@@ -4,6 +4,7 @@ const Admin = require('../models/adminModel');
 const bcrypt = require("bcrypt");
 const saltRounds = 10;
 const jwt = require("jsonwebtoken");
+const QRCode = require('qrcode');
 
 //for Patient Signup
 async function handleSignup(req, res) {
@@ -37,6 +38,21 @@ async function handleSignup(req, res) {
   });
   await newPatient.save();
 
+  //After patient data is saved, fetch the patient ID and genrate QR code
+  const patientData = await Patient.findOne({ email: email });
+  const qrData = {
+    patientId: patientData._id,
+    fullName: patientData.fullName,
+    bloodGroup: patientData.bloodGroup,
+  }
+
+  const qrCodeImageUrl = await QRCode.toDataURL(JSON.stringify(qrData));
+  console.log("Generated QR Code URL:", qrCodeImageUrl);
+
+  // Update patient record with QR code URL
+  newPatient.qrCodeUrl = qrCodeImageUrl;
+  await newPatient.save();
+
   const accessToken = jwt.sign({ newPatient }, process.env.ACCESS_TOKEN_SECRET, {
     expiresIn: "36000m",
   });
@@ -45,6 +61,7 @@ async function handleSignup(req, res) {
     error: false,
     message: "Patient created successfully!",
     accessToken,
+    qrCodeImageUrl,
   });
 }
 

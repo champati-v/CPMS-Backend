@@ -10,6 +10,7 @@ const patientSchema = new Schema({
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
     imageUrl: { type: String },
+    qrCodeUrl: { type: String },
     createdOn : { type: Date, default: new Date().getTime() },
 });
 
