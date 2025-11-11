@@ -172,7 +172,7 @@ async function handleLogin(req, res) {
   const patientInfo = await Patient.findOne({ email: email });
 
   if (!patientInfo) {
-    return res.json({
+    return res.status(404).json({
       error: true,
       message: "Patient not found",
     });
@@ -183,15 +183,21 @@ async function handleLogin(req, res) {
     return res.status(400).json({ message: "Invalid credentials ⚠️" });
   }
 
+  const payload = {
+    id: patientInfo._id,
+    email: patientInfo.email,
+    fullName: patientInfo.fullName,
+    role: patientInfo.role,
+  }
+
   if (patientInfo.email === email && isMatch) {
-    const patient = { patient: patientInfo };
-    const accessToken = jwt.sign(patient, process.env.ACCESS_TOKEN_SECRET, {
+    const accessToken = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, {
       expiresIn: "36000m",
     });
-    return res.json({
+    return res.status(200).json({
       error: false,
       message: "Login successful!",
-      email,
+      patientInfo,
       accessToken,
     });
   } else {
@@ -231,14 +237,24 @@ async function handleDoctorLogin(req, res) {
   }
 
   if (doctorInfo.email === email && isMatch) {
-    const doctor = { doctor: doctorInfo };
-    const accessToken = jwt.sign(doctor, process.env.ACCESS_TOKEN_SECRET, {
+    
+    const payload = {
+      id: doctorInfo._id,
+      email: doctorInfo.email,
+      fullName: doctorInfo.fullName,
+      role: doctorInfo.role,
+      speciality: doctorInfo.speciality,
+      hospital: doctorInfo.hospital,
+      experience: doctorInfo.experience,
+    }
+
+    const accessToken = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, {
       expiresIn: "36000m",
     });
     return res.json({
       error: false,
       message: "Doctor login successful!",
-      email,
+      doctorInfo,
       accessToken,
     });
   } else {
@@ -278,14 +294,20 @@ async function handleAdminLogin(req, res) {
   }
 
   if (adminInfo.email === email && isMatch) {
-    const admin = { admin: adminInfo };
-    const accessToken = jwt.sign(admin, process.env.ACCESS_TOKEN_SECRET, {
+    const payload = {
+      id: adminInfo._id,
+      email: adminInfo.email,
+      fullName: adminInfo.fullName,
+      role: adminInfo.role,
+      hospital: adminInfo.hospital,
+    }
+    const accessToken = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, {
       expiresIn: "36000m",
     });
     return res.json({
       error: false,
       message: "Admin login successful!",
-      email,
+      adminInfo,
       accessToken,
     });
   } else {
