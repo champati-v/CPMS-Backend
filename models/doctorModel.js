@@ -13,6 +13,7 @@ const doctorSchema = new Schema({
     experience: { type: String, required: true },
     password: { type: String, required: true },
     imageUrl: { type: String },
+    department: { type: mongoose.Types.ObjectId, ref: 'Department', required: true },
     createdOn : { type: Date, default: new Date().getTime() },
 });
 

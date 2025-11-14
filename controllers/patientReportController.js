@@ -50,7 +50,7 @@ async function savePatientReport( req,res ){
 }
 
 async function getPatientReports( req,res ){
-    const { patientId } = req.params;
+    const patientId = req.user.id;
 
     try{
         const patientReports = await patientReportModel.find({ patientId });
@@ -69,4 +69,24 @@ async function getPatientReports( req,res ){
     }
 }
 
-module.exports = { savePatientReport , getPatientReports};
+async function doctorGetPatientReports(req, res){
+    const { patientId } = req.body;
+
+     try{
+        const patientReports = await patientReportModel.find({ patientId });
+
+        return res.status(200).json({
+            error: false,
+            message: "Patient reports retrieved successfully",
+            data: patientReports
+        });
+    } catch (error) {
+        console.error("Error retrieving patient reports:", error);
+        return res.status(500).json({
+            error: true,
+            message: "Internal server error ⚠️"
+        });
+    }
+}
+
+module.exports = { savePatientReport , getPatientReports, doctorGetPatientReports};

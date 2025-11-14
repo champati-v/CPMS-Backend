@@ -8,9 +8,9 @@ const QRCode = require('qrcode');
 
 //for Patient Signup
 async function handleSignup(req, res) {
-    const { fullName, email, password, address, bloodGroup, phone, role } = req.body;
+    const { fullName, email, password, address, bloodGroup, phone, role, age, gender } = req.body;
 
-  if (!fullName || !email || !password || !address || !bloodGroup || !phone) {
+  if (!fullName || !email || !password || !address || !bloodGroup || !phone || !age || !gender) {
     return res
       .status(400)
       .json({ error: true, message: "Please fill in all details ⚠️" });
@@ -33,6 +33,8 @@ async function handleSignup(req, res) {
     address,
     bloodGroup,
     phone,
+    age,
+    gender,
     role,
     password: hashedPassword,
   });
@@ -67,9 +69,9 @@ async function handleSignup(req, res) {
 
 //for doctor Signup
 async function handleDoctorSignup(req, res) {
-    const { fullName, email, password, address, bloodGroup, phone, role, speciality, hospital, experience } = req.body;
-
-  if (!fullName || !email || !password || !address || !bloodGroup || !phone || !speciality || !hospital || !experience) {
+    const { fullName, email, password, address, bloodGroup, phone, role, speciality, hospital, experience, department } = req.body;
+  
+  if (!fullName || !email || !password || !address || !bloodGroup || !phone || !speciality || !hospital || !experience || !department) {
     return res
       .status(400)
       .json({ error: true, message: "Please fill in all details ⚠️" });
@@ -97,6 +99,7 @@ async function handleDoctorSignup(req, res) {
     speciality,
     hospital,
     experience,
+    department,
   });
   await newDoctor.save();
 
@@ -225,7 +228,9 @@ async function handleDoctorLogin(req, res) {
   const doctorInfo = await Doctor.findOne({ email: email });
 
   if (!doctorInfo) {
-    return res.json({
+    return res
+    .status(404)
+    .json({
       error: true,
       message: "Doctor not found",
     });
@@ -251,7 +256,9 @@ async function handleDoctorLogin(req, res) {
     const accessToken = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, {
       expiresIn: "36000m",
     });
-    return res.json({
+    return res
+    .status(200)
+    .json({
       error: false,
       message: "Doctor login successful!",
       doctorInfo,
@@ -282,7 +289,9 @@ async function handleAdminLogin(req, res) {
   const adminInfo = await Admin.findOne({ email: email });
 
   if (!adminInfo) {
-    return res.json({
+    return res
+    .status(404)
+    .json({
       error: true,
       message: "Admin not found",
     });
@@ -304,7 +313,9 @@ async function handleAdminLogin(req, res) {
     const accessToken = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, {
       expiresIn: "36000m",
     });
-    return res.json({
+    return res
+    .status(200)
+    .json({
       error: false,
       message: "Admin login successful!",
       adminInfo,

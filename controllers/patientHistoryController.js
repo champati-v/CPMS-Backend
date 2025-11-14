@@ -26,7 +26,7 @@ async function savePatientHistory(req, res) {
             console.log("Patient found:", isPatient.fullName);
         }
 
-        const newHistory = new patientHistoryModel({
+        const newHistory = new patientHistory({
             patientId,
             patientName: isPatient.fullName,
             doctorId,
@@ -54,7 +54,7 @@ async function savePatientHistory(req, res) {
 }
 
 async function getPatientHistories(req, res) {
-    const { patientId } = req.params;
+    const patientId = req.user.id;
 
     try{
         const patientHistories = await patientHistory.find({ patientId });
@@ -71,4 +71,21 @@ async function getPatientHistories(req, res) {
     }
 }
 
-module.exports = { savePatientHistory, getPatientHistories };
+async function doctorGetPatientHistories(req, res) {
+    const {patientId} = req.body;
+    try{
+        const patientHistories = await patientHistory.find({ patientId });
+        return res.status(200).json({
+            error: false,
+            message: "Patient histories retrieved successfully",
+            data: patientHistories
+        });
+    } catch (error) {
+        return res.status(500).json({
+            error: true,
+            message: `An error occurred while retrieving patient histories. ${error.message}`,
+        });
+    }
+}
+
+module.exports = { savePatientHistory, getPatientHistories, doctorGetPatientHistories };
